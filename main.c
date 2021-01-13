@@ -23,11 +23,11 @@ void write_stdntudent() {
   printf("\nEnter The roll number of stdntudent ");
   scanf("%d", &stdnt.regNumber);
   fflush(stdin);
-  printf("\n\nEnter The Name of stdntudent ");
+  printf("\n\nEnter The Name of student ");
   gets(stdnt.name);
   printf("\nEnter The marks in physics out of 100 : ");
   scanf("%d", &stdnt.p_marks);
-  printf("\nEnter The marks in chemistdntry out of 100 : ");
+  printf("\nEnter The marks in chemistry out of 100 : ");
   scanf("%d", &stdnt.c_marks);
   printf("\nEnter The marks in maths out of 100 : ");
   scanf("%d", &stdnt.m_marks);
@@ -49,5 +49,46 @@ void write_stdntudent() {
   fwrite(&stdnt, sizeof(stdnt), 1, fptr);
   fclose(fptr);
   printf("\n\nstdntudent Record Has Been Created ");
+  getch();
+}
+
+void printInfo() {
+  printf("\nRoll Number of Student : %d", stdnt.regNumber);
+  printf("\nName of student : %s", stdnt.name);
+  printf("\nMarks in Physics : %d", stdnt.p_marks);
+  printf("\nMarks in Chemistry : %d", stdnt.c_marks);
+  printf("\nMarks in Maths : %d", stdnt.m_marks);
+  printf("\nMarks in English : %d", stdnt.e_marks);
+  printf("\nMarks in Computer Science : %d", stdnt.cs_marks);
+  printf("\nPercentage of student is  : %.2f", stdnt.per);
+  printf("\nGrade of student is : %c", stdnt.grade);
+}
+
+void display_all() {
+  system("clear");
+  printf("\n\n\n\t\tDISPLAY ALL RECORD !!!\n\n");
+  fptr = fopen("student.dat", "rb");
+  while ((fread(&stdnt, sizeof(stdnt), 1, fptr)) > 0) {
+    printInfo();
+    printf("\n\n====================================\n");
+    getch();
+  }
+  fclose(fptr);
+  getch();
+}
+
+void display_sp(int n) {
+  int flag = 0;
+  fptr = fopen("student.dat", "rb");
+  while ((fread(&stdnt, sizeof(stdnt), 1, fptr)) > 0) {
+    if (stdnt.regNumber == n) {
+      system("clear");
+      printInfo();
+      flag = 1;
+    }
+  }
+  fclose(fptr);
+  if (flag == 0)
+    printf("\n\nrecord not exist");
   getch();
 }
