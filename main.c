@@ -1,8 +1,42 @@
 #include <stdio.h>
 // #include <conio.h>
-#include <curses.h>
+// #include <curses.h>
 // #include <process.h>
 #include <stdlib.h>
+#include <termios.h>
+
+static struct termios old, current;
+
+/* Initialize new terminal i/o settings */
+void initTermios(int echo) {
+  tcgetattr(0, &old);         /* grab old terminal i/o settings */
+  current = old;              /* make new settings same as old settings */
+  current.c_lflag &= ~ICANON; /* disable buffered i/o */
+  if (echo) {
+    current.c_lflag |= ECHO; /* set echo mode */
+  } else {
+    current.c_lflag &= ~ECHO; /* set no echo mode */
+  }
+  tcsetattr(0, TCSANOW, &current); /* use these new terminal i/o settings now */
+}
+
+/* Restore old terminal i/o settings */
+void resetTermios(void) { tcsetattr(0, TCSANOW, &old); }
+
+/* Read 1 character - echo defines echo mode */
+char getch_(int echo) {
+  char ch;
+  initTermios(echo);
+  ch = getchar();
+  resetTermios();
+  return ch;
+}
+
+/* Read 1 character without echo */
+char getch(void) { return getch_(0); }
+
+/* Read 1 character with echo */
+char getche(void) { return getch_(1); }
 
 // student structure { subjects include Physics, maths, english, comp science}
 struct sttudent {
@@ -15,9 +49,11 @@ struct sttudent {
 
 } stdnt;
 
+void gotoxy(int x, int y) { printf("%c[%d;%df", 0x1B, y, x); }
+
 FILE *fptr;
 
-void write_stdntudent() {
+void write_student() {
   fptr = fopen("student.dat", "ab");
   printf("\nPlease Enter The New Details of stdntudent \n");
   printf("\nEnter The Reg Number of stdntudent ");
@@ -155,7 +191,7 @@ void delete_student() {
   FILE *fptr2;
   system("clear");
   printf("\n\n\n\tDelete Record");
-  printf("\n\nPlease Enter The roll number of student You Want To Delete");
+  printf("\n\nPlease Enter The Reg Number of student You Want To Delete");
   scanf("%d", &no);
   fptr = fopen("student.dat", "rb");
 
@@ -198,4 +234,117 @@ void class_result() {
   }
   fclose(fptr);
   getch();
+  system("PAUSE");
+}
+
+void result() {
+  int ans, rno;
+  char ch;
+  system("clear");
+  printf("\n\n\nRESULT MENU");
+  printf(
+      "\n\n\n1. Class Result\n\n2. Student Report Card\n\n3.Back to Main Menu");
+  printf("\n\n\nEnter Choice (1/2)? ");
+  scanf("%d", &ans);
+  switch (ans) {
+  case 1:
+    class_result();
+    break;
+  case 2: {
+    do {
+      char ans;
+      system("clear");
+      printf("\n\nEnter Reg Number Of Student : ");
+      scanf("%d", &rno);
+      display_sp(rno);
+      printf("\n\nDo you want to See More Result (y/n)?");
+      scanf("%c", &ans);
+    } while (ans == 'y' || ans == 'Y');
+    break;
+  }
+  case 3:
+    break;
+  default:
+    printf("\a");
+  }
+}
+
+void intro() {
+  system("clear");
+  gotoxy(35, 11);
+  printf("STUDENT");
+  gotoxy(33, 14);
+  printf("REPORT CARD");
+  gotoxy(35, 17);
+  printf("PROJECT");
+  printf("\n\n\n\n\n\nMADE BY : TWITHS TEAM");
+  getch();
+}
+
+void entry_menu() {
+  char ch2;
+  system("clear");
+  printf("\n\n\n\tENTRY MENU");
+  printf("\n\n\t1.CREATE STUDENT RECORD");
+  printf("\n\n\t2.DISPLAY ALL STUDENTS RECORDS");
+  printf("\n\n\t3.SEARCH STUDENT RECORD ");
+  printf("\n\n\t4.MODIFY STUDENT RECORD");
+  printf("\n\n\t5.DELETE STUDENT RECORD");
+  printf("\n\n\t6.BACK TO MAIN MENU");
+  printf("\n\n\tPlease Enter Your Choice (1-6) ");
+  ch2 = getche();
+  switch (ch2) {
+  case '1':
+    system("clear");
+    write_student();
+    break;
+  case '2':
+    display_all();
+    break;
+  case '3': {
+    int num;
+    system("clear");
+    printf("\n\n\tPlease Enter The Reg Number ");
+    scanf("%d", &num);
+    display_sp(num);
+  } break;
+  case '4':
+    modify_student();
+    break;
+  case '5':
+    delete_student();
+    break;
+  case '6':
+    break;
+  default:
+    printf("\a");
+    entry_menu();
+  }
+}
+int main() {
+  char ch;
+  intro();
+  do {
+    system("clear");
+    printf("\n\n\n\tMAIN MENU");
+    printf("\n\n\t01. RESULT MENU");
+    printf("\n\n\t02. ENTRY/EDIT MENU");
+    printf("\n\n\t03. EXIT");
+    printf("\n\n\tPlease Select Your Option (1-3) ");
+    ch = getche();
+    switch (ch) {
+    case '1':
+      system("clear");
+      result();
+      break;
+    case '2':
+      entry_menu();
+      break;
+    case '3':
+      exit(0);
+    default:
+      printf("\a");
+    }
+  } while (ch != '3');
+  return 0;
 }
