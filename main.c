@@ -149,3 +149,27 @@ void modify_student() {
     printf("\n\n Record Not Found ");
   getch();
 }
+
+void delete_student() {
+  int no;
+  FILE *fptr2;
+  system("clear");
+  printf("\n\n\n\tDelete Record");
+  printf("\n\nPlease Enter The roll number of student You Want To Delete");
+  scanf("%d", &no);
+  fptr = fopen("student.dat", "rb");
+
+  fptr2 = fopen("Temp.dat", "wb");
+  rewind(fptr);
+  while ((fread(&stdnt, sizeof(stdnt), 1, fptr)) > 0) {
+    if (stdnt.regNumber != no) {
+      fwrite(&stdnt, sizeof(stdnt), 1, fptr2);
+    }
+  }
+  fclose(fptr2);
+  fclose(fptr);
+  remove("student.dat");
+  rename("Temp.dat", "student.dat");
+  printf("\n\n\tRecord Deleted ..");
+  getch();
+}
