@@ -173,3 +173,29 @@ void delete_student() {
   printf("\n\n\tRecord Deleted ..");
   getch();
 }
+
+void class_result() {
+  system("clear");
+  fptr = fopen("student.dat", "rb");
+  if (fptr == NULL) {
+    printf("ERROR!!! FILE COULD NOT BE OPEN\n\n\n Go To Entry Menu to create "
+           "File");
+    printf("\n\n\n Program is closing ....");
+    getch();
+    exit(0);
+  }
+
+  printf("\n\n\t\tALL STUDENTS RESULT \n\n");
+  printf("====================================================\n");
+  printf("R.No.  Name       P   C   M   E   CS  %%age   Grade\n");
+  printf("====================================================\n");
+
+  while ((fread(&stdnt, sizeof(stdnt), 1, fptr)) > 0) {
+    printf("%-6d %-10s %-3d %-3d %-3d %-3d %-3d %-3.2f  %-1c\n",
+           stdnt.regNumber, stdnt.name, stdnt.p_marks, stdnt.c_marks,
+           stdnt.m_marks, stdnt.e_marks, stdnt.cs_marks, stdnt.per,
+           stdnt.grade);
+  }
+  fclose(fptr);
+  getch();
+}
